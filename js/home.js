@@ -79,7 +79,7 @@ const remove = (node) => {
 // Function to update already existing data of an perticular employee
 const update= (node)=>{
     // Find employee data having same id to update from local storage
-    let empPayrollData= empPayrollList.find(empData=>empData._id= node.id);
+    let empPayrollData= empPayrollList.find(empData=>empData._id == node.id);
     // If id doesn't exist in local storage, then return
     if(!empPayrollData) return;
     // To store data which is supposed to be updated, another local storage object editEmp is created
