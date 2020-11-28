@@ -1,3 +1,9 @@
+// Variable to check if this page is opened for adding new employee or updating existing employee
+let isUpdate=false;
+// If it is called for updating existing data then employeePayrollObj will store that data object
+let employeePayrollObj={};
+
+
 window.addEventListener('DOMContentLoaded', (event) =>{
     var name = document.querySelector('#name');
     var textError = document.querySelector('.text-error');
@@ -50,6 +56,9 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             dateError.textContent = e;
         }
     }
+
+    // Check either page is loaded for adding new data or info updation purpose
+    checkForUpdate();
 });
 
 var save = () =>{
@@ -151,12 +160,58 @@ var setTextValue = (id, value) => {
     element.textContent = value;
 }
 
-var setValue = (id, value) =>{
+var setValue = (id, value) => {
     let element = document.querySelector(id);
     element.value = value;
-    if(id=='#salary'){
+    if (id == '#salary') {
         var salary = document.querySelector('#salary');
         var output = document.querySelector('.salary-output');
         output.textContent = salary.value;
     }
+}
+
+// This function will set employeePayrollObj if this page is called for updating purpose otherwise does nothing
+const checkForUpdate = () => {
+    const employeePayrollJson = localStorage.getItem('editEmp');
+    isUpdate = employeePayrollJson ? true : false;
+    if (!isUpdate) return;
+    employeePayrollObj = JSON.parse(employeePayrollJson);
+    setForm();
+}
+
+// When payroll_form will be opened for update data, it is supposed to show stored data
+const setForm = () => {
+    //calling set value function to set text fields and date
+    setValue('#name', employeePayrollObj._name);
+    //calling set selected values function to check the fields
+    setSelectedValues('[name=profile]', employeePayrollObj._profilePic);
+    setSelectedValues('[name=gender]', employeePayrollObj._gender);
+    setSelectedValues('[name=department]', employeePayrollObj._department);
+    setValue('#salary',employeePayrollObj._salary);
+    //calling set text value function to set text content of output salary
+    setTextValue('.salary-output', employeePayrollObj._salary);
+    setValue('#notes',employeePayrollObj._note);
+    let date = stringifyDate(employeePayrollObj._startDate).split(" ");
+    setValue('#day', date[0]);
+    setValue('#month',date[1]);
+    setValue('#year',date[2]);
+}
+
+// This function is called to mark check boxes using pre-submitted data, that is under updation process
+const setSelectedValues = (propertyValue, value) => {
+    //getting all the items for property passed in query selector
+    let allItems = document.querySelectorAll(propertyValue);
+    //for each item of allItems, condition is checked if item is array or not
+    allItems.forEach(item => {
+        //if value that recieved as input is array, then value array is checked for item value received from allItems
+        //if value matches, particular item is checked
+        if(Array.isArray(value)) {
+            if (value.includes(item.value)) {
+                item.checked = true;
+            }
+        }
+        //if value is not array
+        else if (item.value === value)
+            item.checked = true;
+    });    
 }
